@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">PokemonInfo</string>
+    <string name="informed_error">Error :</string>
+    <string name="error">Something went wrong</string>
+    <string name="detail_height">Height : %1$s cm</string>
+    <string name="detail_weight">Weight : %1$s kg</string>
+    <string name="detail_type">Type : %1$s</string>
+    <string name="try_again">Try again</string>
+</resources>
