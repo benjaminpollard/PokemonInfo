@@ -4,8 +4,8 @@ import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.models.responceModels.PokemonPageResponse
 import com.dd.idea.pokemoninfo.models.responceModels.PokemonResponse
 
-class PokemonMapper {
-    private fun map(remoteResponse: PokemonResponse): Pokemon {
+class PokemonMapper : IPokemonMapper {
+    override fun map(remoteResponse: PokemonResponse): Pokemon {
         return Pokemon().apply {
             name = remoteResponse.name
             url = remoteResponse.url
@@ -13,7 +13,7 @@ class PokemonMapper {
     }
 
     //map remote model to local model we will save and use thought out app
-    fun map(remoteResponse: PokemonPageResponse?): List<Pokemon> {
+    override fun map(remoteResponse: PokemonPageResponse?): List<Pokemon> {
         val items = mutableListOf<Pokemon>()
         remoteResponse?.results?.forEach {
             items.add(map(it))

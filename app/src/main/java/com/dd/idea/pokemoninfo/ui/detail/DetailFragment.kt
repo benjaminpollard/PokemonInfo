@@ -31,14 +31,20 @@ class DetailFragment : Fragment() {
     ): View {
 
         binding = DetailFragmentBinding.inflate(inflater)
+
+        setUpOnClicks()
+        setUpObservers()
+
+        return binding.root
+    }
+
+    private fun setUpOnClicks() {
         binding.back.setOnClickListener {
             viewModel.onBackPressed()
         }
         binding.retry.setOnClickListener {
             viewModel.onRetryPressed()
         }
-        setUpObservers()
-        return binding.root
     }
 
     private fun setUpObservers() {

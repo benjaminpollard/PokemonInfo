@@ -4,9 +4,9 @@ import com.dd.idea.pokemoninfo.models.PokemonDetails
 import com.dd.idea.pokemoninfo.models.responceModels.PokemonDetailsResponse
 import java.util.*
 
-class PokemonDetailsMapper {
+class PokemonDetailsMapper : IPokemonDetailsMapper {
     //map remote model to local model we will save and use thought out app
-    fun map(remoteResponse: PokemonDetailsResponse): PokemonDetails {
+    override fun map(remoteResponse: PokemonDetailsResponse): PokemonDetails {
         return PokemonDetails().apply {
             height = remoteResponse.height
             image = remoteResponse.sprit.artwork

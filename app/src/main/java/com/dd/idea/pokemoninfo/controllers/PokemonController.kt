@@ -5,9 +5,9 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.models.PokemonDetails
-import com.dd.idea.pokemoninfo.models.mappers.PokemonDetailsMapper
-import com.dd.idea.pokemoninfo.models.mappers.PokemonMapper
-import com.dd.idea.pokemoninfo.services.BaseNetworkService
+import com.dd.idea.pokemoninfo.models.mappers.IPokemonDetailsMapper
+import com.dd.idea.pokemoninfo.models.mappers.IPokemonMapper
+import com.dd.idea.pokemoninfo.services.IBaseNetworkService
 import com.dd.idea.pokemoninfo.services.PokemonService
 import com.dd.idea.pokemoninfo.services.database.IDatabaseService
 import kotlinx.coroutines.CoroutineScope
@@ -18,10 +18,10 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class PokemonController(
-    private val networkService: BaseNetworkService,
+    private val networkService: IBaseNetworkService,
     private val databaseService: IDatabaseService,
-    private val pokemonMapper: PokemonMapper,
-    private val pokemonDetailsMapper: PokemonDetailsMapper
+    private val pokemonMapper: IPokemonMapper,
+    private val pokemonDetailsMapper: IPokemonDetailsMapper
 ) : PagingSource<Int, Pokemon>() {
 
     val pokemonDetailLiveData: MutableLiveData<PokemonDetails> = MutableLiveData()
@@ -30,7 +30,7 @@ class PokemonController(
 
     fun getPokemonDetail(name: String, pokemonUrl: String) {
 
-        //Check database for know items and post
+        //Check database for know items and post if found
         databaseService.getItems(PokemonDetails::class.java).let { details ->
             CoroutineScope(Dispatchers.Main).launch {
                 details.collect { cd ->
@@ -75,7 +75,6 @@ class PokemonController(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pokemon> {
-
         //Call network for latest items and post them on success
         //to use a database and Jetpack Paging would make need of Experimental so skipping for now
         return try {

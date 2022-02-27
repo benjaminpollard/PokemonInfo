@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.dd.idea.pokemoninfo.ApplicationInstance
 import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.controllers.PokemonController
@@ -19,9 +20,9 @@ class MainViewModel(private val controller: PokemonController) : ViewModel(),
     val showPokemonDetailLiveData: MutableLiveData<Event<Pokemon>> = MutableLiveData()
     val toastLiveData: MutableLiveData<Event<String>> = MutableLiveData()
 
-    val pokemonListFlow = Pager(PagingConfig(pageSize = 20)) {
+    val pokemonListLiveData = Pager(PagingConfig(pageSize = 20)) {
         controller
-    }.flow.cachedIn(viewModelScope)
+    }.liveData.cachedIn(viewModelScope)
 
     init {
         //handle formatting errors to be ui friendly

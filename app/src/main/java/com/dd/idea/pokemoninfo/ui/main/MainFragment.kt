@@ -12,7 +12,6 @@ import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.databinding.MainFragmentBinding
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.ui.detail.DetailFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -36,7 +35,7 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        binding = MainFragmentBinding.inflate(inflater).apply {
+        val binding = MainFragmentBinding.inflate(inflater).apply {
 
             adapter = PokemonAdapter(object : PokemonAdapter.OnItemClick {
                 override fun selected(pokemon: Pokemon) {
@@ -50,18 +49,18 @@ class MainFragment : Fragment() {
 
         setUpObservers()
 
-        lifecycleScope.launch {
-            viewModel.pokemonListFlow.collectLatest { pagedData ->
-                adapter?.submitData(pagedData)
-            }
-        }
-
         return binding.root
     }
 
     private fun setUpObservers() {
 
         viewModel.apply {
+
+            viewModel.pokemonListLiveData.observe(viewLifecycleOwner) { pagedData ->
+                lifecycleScope.launch {
+                    adapter?.submitData(pagedData)
+                }
+            }
 
             showPokemonDetailLiveData.observe(viewLifecycleOwner) {
                 it.getContentIfNotHandled()?.let { pokemon ->

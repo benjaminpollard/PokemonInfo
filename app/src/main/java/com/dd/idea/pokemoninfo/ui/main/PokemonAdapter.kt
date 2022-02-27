@@ -19,10 +19,10 @@ class PokemonAdapter(var onItemClick: OnItemClick) :
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
         val binding = holder.binding
-
-        binding.pokemonName.text = getItem(position)?.name?.capitalize(Locale.ROOT)
+        val item = getItem(position)
+        binding.pokemonName.text = item?.name?.capitalize(Locale.ROOT)
         binding.root.setOnClickListener {
-            getItem(position)?.let { it1 -> onItemClick.selected(it1) }
+            item?.let { it1 -> onItemClick.selected(it1) }
         }
     }
 
