@@ -1,8 +1,6 @@
 package com.dd.idea.pokemoninfo.controllers
 
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.models.PokemonDetails
 import com.dd.idea.pokemoninfo.models.mappers.IPokemonDetailsMapper
@@ -22,8 +20,8 @@ class PokemonController(
     private val databaseService: IDatabaseService,
     private val pokemonMapper: IPokemonMapper,
     private val pokemonDetailsMapper: IPokemonDetailsMapper
-) : PagingSource<Int, Pokemon>() {
-
+) {
+    val pokemonLiveData: MutableLiveData<List<Pokemon>> = MutableLiveData()
     val pokemonDetailLiveData: MutableLiveData<PokemonDetails> = MutableLiveData()
     val pokemonErrorLiveData: MutableLiveData<String> = MutableLiveData()
     val pokemonDetailErrorLiveData: MutableLiveData<String> = MutableLiveData()
@@ -67,39 +65,38 @@ class PokemonController(
         }
     }
 
+    fun getPokemonList() {
+        //Call network for latest items and post them on success
+        //to use a database and Jetpack Paging would make need of Experimental so skipping for now
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+
+                val response =
+                    getPokemonService().getList(0, PAGE_SIZE)
+
+                val mappedItems = pokemonMapper.map(response)
+
+                pokemonLiveData.postValue(mappedItems)
+                databaseService.updateOrInsertItems(mappedItems)
+
+            } catch (e: HttpException) {
+                pokemonErrorLiveData.postValue(e.message)
+
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                pokemonErrorLiveData.postValue("")
+
+            }
+        }
+
+    }
+
     private fun getPokemonService() =
         networkService.serviceConstructor(PokemonService::class.java) as PokemonService
 
-    override fun getRefreshKey(state: PagingState<Int, Pokemon>): Int? {
-        return null
+    companion object {
+        const val PAGE_SIZE = 20
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pokemon> {
-        //Call network for latest items and post them on success
-        //to use a database and Jetpack Paging would make need of Experimental so skipping for now
-        return try {
-            val nextPageNumber = params.key ?: 0
-
-            val response =
-                getPokemonService().getList(nextPageNumber * params.loadSize, params.loadSize)
-
-            withContext(Dispatchers.Main) {
-
-                return@withContext LoadResult.Page(
-                    data = pokemonMapper.map(response),
-                    prevKey = if (nextPageNumber > 0) nextPageNumber - 1 else null,
-                    nextKey = if (nextPageNumber < response.count) nextPageNumber + 1 else null
-                )
-            }
-
-        } catch (e: HttpException) {
-            pokemonErrorLiveData.postValue(e.message)
-            LoadResult.Error(e)
-
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            pokemonErrorLiveData.postValue("")
-            LoadResult.Error(e)
-        }
-    }
 }
