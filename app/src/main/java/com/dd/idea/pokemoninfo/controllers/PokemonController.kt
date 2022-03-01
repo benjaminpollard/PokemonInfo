@@ -11,8 +11,8 @@ import com.dd.idea.pokemoninfo.services.database.IDatabaseService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class PokemonController(
@@ -29,15 +29,14 @@ class PokemonController(
     fun getPokemonDetail(name: String, pokemonUrl: String) {
 
         //Check database for know items and post if found
-        databaseService.getItems(PokemonDetails::class.java).let { details ->
-            CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main).launch {
+            databaseService.getItems(PokemonDetails::class.java).let { details ->
+                details.flowOn(Dispatchers.IO)
                 details.collect { cd ->
                     cd?.find {
                         it.name == name
                     }?.let {
-                        withContext(Dispatchers.Main) {
-                            pokemonDetailLiveData.postValue(it)
-                        }
+                        pokemonDetailLiveData.postValue(it)
                     }
                 }
             }
@@ -49,13 +48,14 @@ class PokemonController(
             try {
                 val response = getPokemonService().getPokemonDetails(pokemonUrl)
 
-                withContext(Dispatchers.Main) {
+                val model = pokemonDetailsMapper.map(response)
+                // update database with latest items as network is the source of truth
+                pokemonDetailLiveData.postValue(model)
 
-                    val model = pokemonDetailsMapper.map(response)
-                    pokemonDetailLiveData.postValue(model)
-                    // update database with latest items as network is the source of truth
-                    databaseService.updateOrInsertItem(model)
+                CoroutineScope(Dispatchers.Main).launch {
+                    databaseService.updateOrInsertItem(pokemonDetailsMapper.map(response))
                 }
+
             } catch (e: HttpException) {
                 pokemonDetailErrorLiveData.postValue(e.message)
             } catch (e: Throwable) {
