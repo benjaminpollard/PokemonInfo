@@ -4,7 +4,7 @@ import io.realm.RealmObject
 import kotlinx.coroutines.flow.Flow
 
 interface IDatabaseService {
-    suspend fun <T : RealmObject> updateOrInsertItems(item: List<RealmObject>)
+    suspend fun updateOrInsertItems(item: List<RealmObject>)
     suspend fun <T : RealmObject> updateOrInsertItem(item: T)
     fun <T : RealmObject> getItem(type: Class<T>): Flow<T?>
     fun <T : RealmObject> getItems(type: Class<T>): Flow<List<T>?>

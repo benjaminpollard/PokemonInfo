@@ -6,13 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.databinding.MainFragmentBinding
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.ui.detail.DetailFragment
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainFragment : Fragment() {
@@ -44,7 +42,7 @@ class MainFragment : Fragment() {
             })
             pokemonList.layoutManager = LinearLayoutManager(this@MainFragment.requireContext())
 
-            pokemonList.adapter = adapter?.withLoadStateFooter(LoadingAdapter(adapter!!))
+            pokemonList.adapter = adapter
         }
 
         setUpObservers()
@@ -56,10 +54,8 @@ class MainFragment : Fragment() {
 
         viewModel.apply {
 
-            viewModel.pokemonListLiveData.observe(viewLifecycleOwner) { pagedData ->
-                lifecycleScope.launch {
-                    adapter?.submitData(pagedData)
-                }
+            viewModel.pokemonListLiveData.observe(viewLifecycleOwner) {
+                adapter?.addItems(it)
             }
 
             showPokemonDetailLiveData.observe(viewLifecycleOwner) {

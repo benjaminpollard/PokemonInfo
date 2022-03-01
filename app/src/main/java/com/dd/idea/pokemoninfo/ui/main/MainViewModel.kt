@@ -1,13 +1,9 @@
 package com.dd.idea.pokemoninfo.ui.main
 
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.dd.idea.pokemoninfo.ApplicationInstance
 import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.controllers.PokemonController
@@ -20,9 +16,10 @@ class MainViewModel(private val controller: PokemonController) : ViewModel(),
     val showPokemonDetailLiveData: MutableLiveData<Event<Pokemon>> = MutableLiveData()
     val toastLiveData: MutableLiveData<Event<String>> = MutableLiveData()
 
-    val pokemonListLiveData = Pager(PagingConfig(pageSize = 20)) {
-        controller
-    }.liveData.cachedIn(viewModelScope)
+    val pokemonListLiveData: MutableLiveData<List<Pokemon>>
+        get() {
+            return controller.pokemonLiveData
+        }
 
     init {
         //handle formatting errors to be ui friendly
@@ -33,6 +30,11 @@ class MainViewModel(private val controller: PokemonController) : ViewModel(),
                 toastLiveData.postValue(Event(ApplicationInstance.getContext().resources.getString(R.string.error)))
             }
         }
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        controller.getPokemonList()
     }
 
     fun onPokemonSelected(pokemon: Pokemon) {

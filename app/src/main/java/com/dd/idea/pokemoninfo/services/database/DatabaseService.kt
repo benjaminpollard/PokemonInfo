@@ -11,7 +11,7 @@ class DatabaseService : IDatabaseService {
 
     private var realm: Realm = Realm.getDefaultInstance()
 
-    override suspend fun <T : RealmObject> updateOrInsertItems(item: List<RealmObject>) {
+    override suspend fun updateOrInsertItems(item: List<RealmObject>) {
         realm.executeTransactionAwait(Dispatchers.IO) {
             it.insertOrUpdate(item)
         }

@@ -66,9 +66,16 @@ class PokemonController(
     }
 
     fun getPokemonList() {
-        //Call network for latest items and post them on success
-        //to use a database and Jetpack Paging would make need of Experimental so skipping for now
+        CoroutineScope(Dispatchers.Main).launch {
+            databaseService.getItems(Pokemon::class.java).let { details ->
+                details.flowOn(Dispatchers.IO)
+                details.collect { cd ->
+                    pokemonLiveData.postValue(cd)
+                }
+            }
+        }
 
+        //Call network for latest items and post them on success
         CoroutineScope(Dispatchers.IO).launch {
             try {
 
@@ -78,7 +85,9 @@ class PokemonController(
                 val mappedItems = pokemonMapper.map(response)
 
                 pokemonLiveData.postValue(mappedItems)
-                databaseService.updateOrInsertItems(mappedItems)
+                CoroutineScope(Dispatchers.Main).launch {
+                    databaseService.updateOrInsertItems(mappedItems)
+                }
 
             } catch (e: HttpException) {
                 pokemonErrorLiveData.postValue(e.message)
