@@ -18,5 +18,8 @@ interface PokemonService {
     suspend fun getList(@Query(OFF_SET) offset: Int, @Query(LIMIT) limit: Int): PokemonPageResponse
 
     @GET
+    suspend fun getList(@Url url: String): PokemonPageResponse
+
+    @GET
     suspend fun getPokemonDetails(@Url url: String): PokemonDetailsResponse
 }

@@ -6,10 +6,7 @@ import com.dd.idea.pokemoninfo.models.responceModels.PokemonResponse
 
 class PokemonMapper : IPokemonMapper {
     override fun map(remoteResponse: PokemonResponse): Pokemon {
-        return Pokemon().apply {
-            name = remoteResponse.name
-            url = remoteResponse.url
-        }
+        return Pokemon(remoteResponse.name , remoteResponse.url)
     }
 
     //map remote model to local model we will save and use thought out app

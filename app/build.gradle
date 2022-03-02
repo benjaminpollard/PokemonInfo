@@ -4,7 +4,6 @@ plugins {
 }
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
-apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 31
@@ -82,5 +81,10 @@ dependencies {
     //Images
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //databse
+    def room_version = "2.3.0"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
 }

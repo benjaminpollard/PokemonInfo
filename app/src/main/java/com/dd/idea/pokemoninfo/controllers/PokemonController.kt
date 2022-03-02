@@ -1,26 +1,30 @@
 package com.dd.idea.pokemoninfo.controllers
 
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.*
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.models.PokemonDetails
 import com.dd.idea.pokemoninfo.models.mappers.IPokemonDetailsMapper
+import com.dd.idea.pokemoninfo.models.mappers.IPokemonKeyMapper
 import com.dd.idea.pokemoninfo.models.mappers.IPokemonMapper
+import com.dd.idea.pokemoninfo.services.DatabaseService
 import com.dd.idea.pokemoninfo.services.IBaseNetworkService
+import com.dd.idea.pokemoninfo.services.PokemonRemoteMediator
 import com.dd.idea.pokemoninfo.services.PokemonService
-import com.dd.idea.pokemoninfo.services.database.IDatabaseService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class PokemonController(
     private val networkService: IBaseNetworkService,
-    private val databaseService: IDatabaseService,
+    private val databaseService: DatabaseService,
     private val pokemonMapper: IPokemonMapper,
+    private val pokemonKeyMapper: IPokemonKeyMapper,
     private val pokemonDetailsMapper: IPokemonDetailsMapper
-) {
+) : PagingSource<Int, Pokemon>() {
+
     val pokemonLiveData: MutableLiveData<List<Pokemon>> = MutableLiveData()
     val pokemonDetailLiveData: MutableLiveData<PokemonDetails> = MutableLiveData()
     val pokemonErrorLiveData: MutableLiveData<String> = MutableLiveData()
@@ -29,16 +33,11 @@ class PokemonController(
     fun getPokemonDetail(name: String, pokemonUrl: String) {
 
         //Check database for know items and post if found
-        CoroutineScope(Dispatchers.Main).launch {
-            databaseService.getItems(PokemonDetails::class.java).let { details ->
-                details.flowOn(Dispatchers.IO)
-                details.collect { cd ->
-                    cd?.find {
-                        it.name == name
-                    }?.let {
-                        pokemonDetailLiveData.postValue(it)
-                    }
-                }
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseService.pokemonDetailDao().getAll().find {
+                it.name == name
+            }?.let {
+                pokemonDetailLiveData.postValue(it)
             }
         }
 
@@ -52,9 +51,7 @@ class PokemonController(
                 // update database with latest items as network is the source of truth
                 pokemonDetailLiveData.postValue(model)
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    databaseService.updateOrInsertItem(pokemonDetailsMapper.map(response))
-                }
+                databaseService.pokemonDetailDao().insert(pokemonDetailsMapper.map(response))
 
             } catch (e: HttpException) {
                 pokemonDetailErrorLiveData.postValue(e.message)
@@ -65,47 +62,50 @@ class PokemonController(
         }
     }
 
-    fun getPokemonList() {
-        CoroutineScope(Dispatchers.Main).launch {
-            databaseService.getItems(Pokemon::class.java).let { details ->
-                details.flowOn(Dispatchers.IO)
-                details.collect { cd ->
-                    pokemonLiveData.postValue(cd)
-                }
-            }
-        }
+    @OptIn(ExperimentalPagingApi::class)
+    fun getPokemon(): Flow<PagingData<Pokemon>> {
+        return Pager(
+            PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            remoteMediator = PokemonRemoteMediator(networkService, pokemonMapper, pokemonKeyMapper , databaseService),
+            pagingSourceFactory = { databaseService.pokemonDao().getAll() }
+        ).flow
+    }
 
+    override fun getRefreshKey(state: PagingState<Int, Pokemon>): Int? {
+        return null
+    }
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pokemon> {
         //Call network for latest items and post them on success
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
+        //to use a database and Jetpack Paging would make need of Experimental so skipping for now
+        return try {
+            val nextPageNumber = params.key ?: 0
 
-                val response =
-                    getPokemonService().getList(0, PAGE_SIZE)
+            val response =
+                getPokemonService().getList(nextPageNumber * params.loadSize, params.loadSize)
 
-                val mappedItems = pokemonMapper.map(response)
+            return LoadResult.Page(
+                data = pokemonMapper.map(response),
+                prevKey = if (nextPageNumber > 0) nextPageNumber - 1 else null,
+                nextKey = if (nextPageNumber < response.count) nextPageNumber + 1 else null
+            )
 
-                pokemonLiveData.postValue(mappedItems)
-                CoroutineScope(Dispatchers.Main).launch {
-                    databaseService.updateOrInsertItems(mappedItems)
-                }
+        } catch (e: HttpException) {
+            pokemonErrorLiveData.postValue(e.message)
+            LoadResult.Error(e)
 
-            } catch (e: HttpException) {
-                pokemonErrorLiveData.postValue(e.message)
-
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                pokemonErrorLiveData.postValue("")
-
-            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            pokemonErrorLiveData.postValue("")
+            LoadResult.Error(e)
         }
-
     }
 
     private fun getPokemonService() =
         networkService.serviceConstructor(PokemonService::class.java) as PokemonService
 
-    companion object {
-        const val PAGE_SIZE = 20
-    }
 
 }

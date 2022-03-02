@@ -1,13 +1,15 @@
 package com.dd.idea.pokemoninfo.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-open class PokemonDetails : RealmObject() {
-    @PrimaryKey
-    var name = ""
-    var image = ""
-    var type = ""
-    var weight = ""
-    var height = ""
-}
+@Entity
+data class PokemonDetails(
+    @PrimaryKey val uid: Int = 0,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "image") val image: String,
+    @ColumnInfo(name = "type") val type: String,
+    @ColumnInfo(name = "weight") val weight: String,
+    @ColumnInfo(name = "height") val height: String,
+)
