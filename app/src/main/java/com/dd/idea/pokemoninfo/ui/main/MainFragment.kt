@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,6 +58,7 @@ class MainFragment : Fragment() {
         viewModel.apply {
 
             viewModel.pokemonListLiveData.observe(viewLifecycleOwner) {
+                binding.loading.isVisible = false
                 lifecycleScope.launch {
                     adapter?.submitData(it)
                 }

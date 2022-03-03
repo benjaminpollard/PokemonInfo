@@ -2,16 +2,18 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/pokedex_background_colour"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="vertical">
+
+        <include layout="@layout/header" />
 
         <ImageView
+            android:layout_margin="8dp"
             android:id="@+id/back"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -19,76 +21,96 @@
             android:focusable="true"
             android:src="@drawable/ic_back_arrow" />
 
-        <androidx.cardview.widget.CardView
-            style="@style/PokemonCard"
-            android:id="@+id/nameHolder"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+            android:background="@color/pokedex_outer_screen_background_colour"
+            android:orientation="vertical">
 
-            <TextView
+            <androidx.cardview.widget.CardView
+                style="@style/PokemonCard"
+                android:id="@+id/nameHolder"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/name"
+                    android:layout_gravity="center"
+                    android:textSize="32sp"
+                    android:fontFamily="@font/pixel"
+                    tools:text="Zapdos" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/loading"
+                style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/name"
                 android:layout_gravity="center"
-                android:textSize="22sp"
-                tools:text="Zapdos" />
-        </androidx.cardview.widget.CardView>
+                android:foreground="@color/pokedex_outer_screen_background_colour"
+                android:paddingTop="16dp" />
 
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/loading"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingTop="16dp" />
-
-        <Button
-            android:id="@+id/retry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/try_again"
-            android:layout_gravity="center" />
-
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:scaleType="fitCenter" />
-
-        <androidx.cardview.widget.CardView
-            style="@style/PokemonCard"
-            android:id="@+id/detailsHolder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_gravity="center"
-                android:gravity="center"
+            <Button
+                android:id="@+id/retry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="@string/try_again"
+                android:fontFamily="@font/pixel"
+                android:layout_gravity="center" />
 
-                <TextView
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="fitCenter" />
+
+            <androidx.cardview.widget.CardView
+                style="@style/PokemonCard"
+                android:layout_margin="8dp"
+                android:id="@+id/detailsHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_gravity="center"
+                    android:gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/type"
-                    tools:text="Zapdos" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/weight"
-                    tools:text="Zapdos" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/type"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/pixel"
+                        tools:text="Zapdos" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/height"
-                    tools:text="Zapdos" />
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/weight"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/pixel"
+                        tools:text="Zapdos" />
 
-        </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/height"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/pixel"
+                        tools:text="Zapdos" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

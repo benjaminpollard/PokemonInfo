@@ -7,4 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="pokedex_background_colour">#E30000</color>
+    <color name="pokedex_screen_background_colour">#9E9E9E</color>
+    <color name="pokedex_outer_screen_background_colour">#CACACA</color>
+
+    <color name="large_led">#F6E123</color>
+    <color name="small_led_one">#8F2B2B</color>
+    <color name="small_led_two">#063AF3</color>
+    <color name="small_led_three">#26EF0F</color>
+
+
 </resources>

@@ -7,6 +7,8 @@ import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.controllers.PokemonPagingSource
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.ui.Event
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
 class MainViewModel constructor(private val controller: PokemonPagingSource) : ViewModel(),
     DefaultLifecycleObserver {
@@ -14,7 +16,8 @@ class MainViewModel constructor(private val controller: PokemonPagingSource) : V
     val showPokemonDetailLiveData: MutableLiveData<Event<Pokemon>> = MutableLiveData()
     val toastLiveData: MutableLiveData<Event<String>> = MutableLiveData()
 
-    val pokemonListLiveData get() = controller.getPokemon().asLiveData().cachedIn(viewModelScope)
+    val pokemonListLiveData
+        get() = controller.getPokemon().flowOn(Dispatchers.IO).asLiveData().cachedIn(viewModelScope)
 
     init {
         //handle formatting errors to be ui friendly
