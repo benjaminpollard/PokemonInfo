@@ -47,10 +47,6 @@ class DetailViewModel(private val arguments: Bundle?, private val controller: Po
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         stateLiveData.postValue(State.LOADING)
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
 
         pokemonName = arguments?.getString(NAME) ?: ""
         pokemonUrl = arguments?.getString(URL) ?: ""
