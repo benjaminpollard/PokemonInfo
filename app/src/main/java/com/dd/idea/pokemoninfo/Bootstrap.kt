@@ -3,6 +3,7 @@ package com.dd.idea.pokemoninfo
 import android.app.Application
 import androidx.room.Room
 import com.dd.idea.pokemoninfo.controllers.PokemonController
+import com.dd.idea.pokemoninfo.controllers.PokemonPagingSource
 import com.dd.idea.pokemoninfo.models.mappers.*
 import com.dd.idea.pokemoninfo.services.BaseNetworkService
 import com.dd.idea.pokemoninfo.services.DatabaseService
@@ -38,7 +39,9 @@ object Bootstrap {
     }
 
     private val controllerModule = module {
-        factory { PokemonController(get(), databaseService, get(), get() , get()) }
+        factory { PokemonController(get(), databaseService, get()) }
+        factory { PokemonPagingSource(get(), databaseService, get(), get()) }
+
     }
 
     private val servicesModule = module {

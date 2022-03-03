@@ -14,7 +14,7 @@ interface PokemonDoa {
     fun insert(item: Pokemon)
 
     @Query("SELECT * FROM pokemon")
-    suspend fun getAll(): PagingSource<Int, Pokemon>
+    fun getAll(): PagingSource<Int, Pokemon>
 
     @Delete
     fun delete(user: Pokemon)

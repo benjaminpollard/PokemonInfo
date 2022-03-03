@@ -1,4 +1,4 @@
-package com.dd.idea.pokemoninfo.services
+package com.dd.idea.pokemoninfo.controllers
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -8,6 +8,9 @@ import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.models.PokemonKey
 import com.dd.idea.pokemoninfo.models.mappers.IPokemonKeyMapper
 import com.dd.idea.pokemoninfo.models.mappers.IPokemonMapper
+import com.dd.idea.pokemoninfo.services.DatabaseService
+import com.dd.idea.pokemoninfo.services.IBaseNetworkService
+import com.dd.idea.pokemoninfo.services.PokemonService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,13 +29,11 @@ class PokemonRemoteMediator(
         service.serviceConstructor(PokemonService::class.java) as PokemonService
 
     override suspend fun load(
-        // 1
         loadType: LoadType,
-        // 2
         state: PagingState<Int, Pokemon>
     ): MediatorResult {
         return try {
-
+            //on fresh, go back to the start, on PREPEND we don't need to worry about as we start at the start of the list
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -43,11 +44,8 @@ class PokemonRemoteMediator(
                 }
             }
 
-            val response = if(loadKey?.previous == null) {
-                getPokemonService().getList(
-                    0 ,
-                    state.config.pageSize
-                )
+            val response = if (loadKey == null) {
+                getPokemonService().getList(0, state.config.pageSize)
             } else {
                 loadKey.next?.let {
                     getPokemonService().getList(it)
@@ -62,7 +60,6 @@ class PokemonRemoteMediator(
                     database.pokemonDao().insertAll(items)
                     database.pokemonKeyDao().saveKeys(keyToSave)
                 }
-
             }
 
             MediatorResult.Success(endOfPaginationReached = response?.next == null)
@@ -72,10 +69,9 @@ class PokemonRemoteMediator(
         } catch (exception: HttpException) {
             MediatorResult.Error(exception)
         }
-
     }
 
-    private suspend fun getKey(): PokemonKey {
-        return database.pokemonKeyDao().getKeys().first()
+    private suspend fun getKey(): PokemonKey? {
+        return database.pokemonKeyDao().getKeys().lastOrNull()
     }
 }

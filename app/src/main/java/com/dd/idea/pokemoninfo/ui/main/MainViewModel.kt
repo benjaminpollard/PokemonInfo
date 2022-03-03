@@ -1,17 +1,14 @@
 package com.dd.idea.pokemoninfo.ui.main
 
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.dd.idea.pokemoninfo.ApplicationInstance
 import com.dd.idea.pokemoninfo.R
-import com.dd.idea.pokemoninfo.controllers.PokemonController
+import com.dd.idea.pokemoninfo.controllers.PokemonPagingSource
 import com.dd.idea.pokemoninfo.models.Pokemon
 import com.dd.idea.pokemoninfo.ui.Event
 
-class MainViewModel(private val controller: PokemonController) : ViewModel(),
+class MainViewModel constructor(private val controller: PokemonPagingSource) : ViewModel(),
     DefaultLifecycleObserver {
 
     val showPokemonDetailLiveData: MutableLiveData<Event<Pokemon>> = MutableLiveData()

@@ -2,6 +2,7 @@ package com.dd.idea.pokemoninfo.viewModel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.dd.idea.pokemoninfo.controllers.PokemonController
+import com.dd.idea.pokemoninfo.services.DatabaseService
 import com.dd.idea.pokemoninfo.services.PokemonService
 import com.dd.idea.pokemoninfo.testingUtils.mock
 import org.junit.Rule
