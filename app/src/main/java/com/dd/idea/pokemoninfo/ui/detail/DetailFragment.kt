@@ -59,7 +59,7 @@ class DetailFragment : Fragment() {
             pokemonDetailLiveData.observe(viewLifecycleOwner) {
                 binding.apply {
 
-                    Glide.with(this@DetailFragment.requireContext()).load(it.image).into(image)
+                    Glide.with(this@DetailFragment.requireContext()).load(it.image).placeholder(R.drawable.ic_pokemon).into(image)
 
                     binding.name.text = it.name.capitalize(Locale.ROOT)
 
