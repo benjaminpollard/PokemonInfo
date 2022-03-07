@@ -41,11 +41,11 @@ object Bootstrap {
     private val controllerModule = module {
         factory { PokemonController(get(), databaseService, get()) }
         factory { PokemonPagingSource(get(), databaseService, get(), get()) }
-
     }
 
     private val servicesModule = module {
         single { BaseNetworkService() } bind IBaseNetworkService::class
+
     }
 
     private val viewModelsModule = module {
