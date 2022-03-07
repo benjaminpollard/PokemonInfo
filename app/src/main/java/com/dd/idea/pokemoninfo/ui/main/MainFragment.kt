@@ -45,6 +45,11 @@ class MainFragment : Fragment() {
             pokemonList.layoutManager = LinearLayoutManager(this@MainFragment.requireContext())
 
             pokemonList.adapter = adapter?.withLoadStateFooter(LoadingAdapter(adapter!!))
+
+            swiperefresh.setOnRefreshListener {
+                adapter?.refresh()
+
+            }
         }
 
         setUpObservers()
@@ -58,6 +63,7 @@ class MainFragment : Fragment() {
 
             viewModel.pokemonListLiveData.observe(viewLifecycleOwner) {
                 binding.loading.isVisible = false
+                binding.swiperefresh.isRefreshing = false
                 lifecycleScope.launch {
                     adapter?.submitData(it)
                 }

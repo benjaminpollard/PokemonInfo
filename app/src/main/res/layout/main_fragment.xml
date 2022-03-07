@@ -15,12 +15,19 @@
         android:layout_marginBottom="64dp"
         android:layout_marginHorizontal="64dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/pokemonList"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="32dp"
-            android:background="@drawable/inner_rounded_bg" />
+            android:background="@drawable/inner_rounded_bg">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pokemonList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
         <androidx.core.widget.ContentLoadingProgressBar
             android:id="@+id/loading"

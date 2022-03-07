@@ -45,6 +45,7 @@ class PokemonRemoteMediator(
             }
 
             val response = if (loadKey == null) {
+                database.clearAllTables()
                 getPokemonService().getList(0, state.config.pageSize)
             } else {
                 loadKey.next?.let {
