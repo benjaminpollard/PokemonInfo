@@ -10,7 +10,7 @@ import com.dd.idea.pokemoninfo.ui.comparator.PokemonComparator
 import java.util.*
 
 class PokemonAdapter(var onItemClick: OnItemClick) :
-    PagingDataAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(PokemonComparator) {
+    PagingDataAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(PokemonComparator), IRefreshAdaptor {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
         val binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.context), parent, false)

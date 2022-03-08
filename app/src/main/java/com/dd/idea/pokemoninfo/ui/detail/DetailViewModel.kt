@@ -1,17 +1,15 @@
 package com.dd.idea.pokemoninfo.ui.detail
 
 import android.os.Bundle
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.dd.idea.pokemoninfo.ApplicationInstance
 import com.dd.idea.pokemoninfo.R
 import com.dd.idea.pokemoninfo.controllers.PokemonController
+import com.dd.idea.pokemoninfo.controllers.StringResolverController
 import com.dd.idea.pokemoninfo.models.PokemonDetails
 import com.dd.idea.pokemoninfo.ui.Event
 
-class DetailViewModel(private val arguments: Bundle?, private val controller: PokemonController) :
+class DetailViewModel(private val arguments: Bundle?, private val controller: PokemonController, private val stringResolverController: StringResolverController) :
     ViewModel(), DefaultLifecycleObserver {
 
     private var pokemonUrl: String = ""
@@ -26,22 +24,29 @@ class DetailViewModel(private val arguments: Bundle?, private val controller: Po
     val popBackStackLiveData: MutableLiveData<Event<Unit>> = MutableLiveData()
     val stateLiveData: MutableLiveData<State> = MutableLiveData()
 
+    private val errorObserver : Observer<String>
+    private val detailCompleteObserver : Observer<PokemonDetails>
+
     init {
         //handle formatting errors to be ui friendly
-        controller.pokemonDetailErrorLiveData.observeForever {
+        errorObserver = Observer {
             if (it.isNotEmpty()) {
-                toastLiveData.postValue(Event(ApplicationInstance.getContext().resources.getString(R.string.informed_error) + it))
+                toastLiveData.postValue(Event(stringResolverController.get(R.string.informed_error) + it))
             } else {
-                toastLiveData.postValue(Event(ApplicationInstance.getContext().resources.getString(R.string.error)))
+                toastLiveData.postValue(Event(stringResolverController.get(R.string.error)))
             }
             //had an error and don't have data to show
             if (pokemonDetailLiveData.value == null)
                 stateLiveData.postValue(State.ERROR)
         }
 
-        controller.pokemonDetailLiveData.observeForever {
+        detailCompleteObserver = Observer {
             stateLiveData.postValue(State.COMPLETE)
         }
+
+        controller.pokemonDetailErrorLiveData.observeForever(errorObserver)
+        controller.pokemonDetailLiveData.observeForever(detailCompleteObserver)
+
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -61,6 +66,12 @@ class DetailViewModel(private val arguments: Bundle?, private val controller: Po
         pokemonNameLiveData.postValue(pokemonName)
 
         getPokemonDetails()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        controller.pokemonDetailErrorLiveData.removeObserver(errorObserver)
+        controller.pokemonDetailLiveData.removeObserver(detailCompleteObserver)
     }
 
     private fun getPokemonDetails() {

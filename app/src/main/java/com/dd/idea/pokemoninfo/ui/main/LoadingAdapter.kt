@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dd.idea.pokemoninfo.databinding.LayoutLoadingBinding
 
 class LoadingAdapter(
-    private val adapter: PokemonAdapter
+    private val adapter: IRefreshAdaptor
 ) : LoadStateAdapter<LoadingAdapter.NetworkStateItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState) =

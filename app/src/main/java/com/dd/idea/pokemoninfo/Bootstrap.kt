@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.dd.idea.pokemoninfo.controllers.PokemonController
 import com.dd.idea.pokemoninfo.controllers.PokemonPagingSource
+import com.dd.idea.pokemoninfo.controllers.StringResolverController
 import com.dd.idea.pokemoninfo.models.mappers.*
 import com.dd.idea.pokemoninfo.services.BaseNetworkService
 import com.dd.idea.pokemoninfo.services.DatabaseService
@@ -39,6 +40,7 @@ object Bootstrap {
     }
 
     private val controllerModule = module {
+        factory { StringResolverController( ApplicationInstance.getContext() ) }
         factory { PokemonController(get(), databaseService, get()) }
         factory { PokemonPagingSource(get(), databaseService, get(), get()) }
     }
@@ -50,7 +52,7 @@ object Bootstrap {
 
     private val viewModelsModule = module {
         viewModel { MainViewModel(get()) }
-        viewModel { parameters -> DetailViewModel(arguments = parameters.get(), get()) }
+        viewModel { parameters -> DetailViewModel(arguments = parameters.get(), get(), get()) }
     }
 
     private val mappersModule = module {
